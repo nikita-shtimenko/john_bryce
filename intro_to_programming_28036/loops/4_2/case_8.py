@@ -1,5 +1,5 @@
 def main():
-    max_number = -1
+    min_number = -1
 
     while True:
         number = int(input("Enter next number: "))
@@ -7,10 +7,10 @@ def main():
         if number <= 0:
             break
 
-        if number > max_number:
-            max_number = number
+        if number < min_number:
+            min_number = number
 
-    print(f"Max number = {max_number}")
+    print(f"Min number = {min_number}")
     return 1
 
 
