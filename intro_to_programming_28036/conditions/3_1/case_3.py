@@ -1,12 +1,6 @@
 def main():
     value = int(input("Enter first value: "))
-    
-    if value % 2 == 0:
-        print("Even")
-    else:
-        print("Odd")
-        
-    return 1
+    return [print("Even") if value % 2 == 0 else print("Odd")]
 
 
 if __name__ == '__main__':

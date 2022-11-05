@@ -1,12 +1,11 @@
 def main():
-    name = input("Enter name: ")
-    salary = input("Enter salary: ")
-
-    salary = float(salary)
-    salary_raise_percent = 10
+    salary = float(input("Enter salary: "))
+    salary_raise_percent = 0.10
     
-    if (salary_raise_percent * salary) / 100 > 6000:
-        
+    if salary * salary_raise_percent > 6000:
+        salary_raise_percent = 0.05
+
+    print(f"Salary with {salary_raise_percent * 100}% bonus: {salary + (salary * salary_raise_percent)}")
     return 1
 
 
