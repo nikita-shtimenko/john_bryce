@@ -1,159 +1,164 @@
 import string
 
-VALID_AIRCRAFT_CHAR_SYMBOLS = string.ascii_uppercase + ' '
+CHAR_GROUP_DELIMITER = ' '
+VALID_AIRCRAFT_CHAR_SYMBOLS = string.ascii_uppercase
 
 def main():
-    aircraft_chars = getAircraftChars()
-    aircraft_seat = getAircraftSeat(aircraft_chars)
+    chars_layout = getAircraftCharsLayoutFromUser()
+
+    seat = getSeatInAircraftFromUser(chars_layout)
+    seat_len = len(seat)
+
+    seat_char = seat[seat_len - 1:]
+    seat_row = seat[:seat_len - 1]
+    seat_placement = getSeatPlacementInAircraft(chars_layout, seat)
 
     print(f"""
-        Row: {aircraft_seat["row"]}
-        Char: {aircraft_seat["char"]}
-        Place: {aircraft_seat["place"]}
-    """)
-
+        Char: {seat_char}
+        Row: {seat_row}
+        Placement: {seat_placement}
+        """)
+        
     return 1
 
-def getAircraftSeat(aircraft_chars: list[dict]) -> dict():
-    aircraft_seat = None
-    result = None
+def getAircraftCharsLayoutFromUser() -> str:
+    chars_layout = None
 
     while True:
-        aircraft_seat = input("Enter seat in aircraft (example: 1A, 35B): ")
-        aircraft_seat = aircraft_seat.upper()
+        chars_layout = input("Enter aircraft chars layout: ")
+        chars_layout = chars_layout.upper()
 
-        aircraft_seat_len = len(aircraft_seat)
-
-        if aircraft_seat_len not in range(2, 3 + 1):
-            print("Error: seat length has to be in range from 2 to 3.")
+        if not isValidCharsLayout(chars_layout):
             continue
-
-        seat_row = aircraft_seat[:aircraft_seat_len - 1]
-
-        if not seat_row.isdigit():
-            print("Error: invalid format.")
-            continue
-
-        if not 1 <= int(seat_row) <= 99:
-            print("Error: seat row can not be lower than 1 or higher than 99.")
-            continue
-
-        seat_char = aircraft_seat[aircraft_seat_len - 1:].upper()
-
-        if seat_char not in VALID_AIRCRAFT_CHAR_SYMBOLS:
-            print("Error: invalid seat char.")
-            continue
-
-        seat_char_place = None
-
-        for char in aircraft_chars:
-            if seat_char != char.get("char"):
-                continue
-
-            seat_char_place = char.get("place")
-            break
-
-
-        if seat_char_place is None:
-            print("Error: char does not exists. Try again.")
-            continue
-
-        result = {
-            "char": seat_char,
-            "row": seat_row,
-            "place": seat_char_place
-        }
 
         break
 
-    return result
+    return chars_layout
 
+def isValidCharsLayout(chars_layout: str) -> bool:
+    if len(chars_layout) < 3:
+        print("Error: chars layout lenght can not be less then 3 symbols.")
+        return False
 
-def getAircraftChars() -> list[dict]:
-    aircraft_chars_layout = None
-    result = list()
+    if chars_layout.isspace():
+        print("Error: chars layout can not be only white-spaces.")
+        return False
 
-    while True:
-        aircraft_chars_layout = input("Enter aircraft chars layout: ")
-        aircraft_chars_layout = aircraft_chars_layout.upper()
-        
-        if len(aircraft_chars_layout) < 3:
-            print("Error: aircraft can not contain less than 2 char groups.")
-            continue
+    if chars_layout.count(CHAR_GROUP_DELIMITER) < 1:
+        print("Error: there should be at least 2 groups of chars.")
+        return False
 
-        if aircraft_chars_layout.isspace():
-            print("Error: aircraft chars layout can not be only white-spaces.")
-            continue
+    if chars_layout.startswith(CHAR_GROUP_DELIMITER):
+        print("Error: aircraft chars layout can not start with white-space.")
+        return False
 
-        if aircraft_chars_layout.count(' ') == 0:
-            print("Error: invalid input.")
-            continue
+    if chars_layout.endswith(CHAR_GROUP_DELIMITER):
+        print("Error: aircraft chars layout can not end with white-space.")
+        return False
 
-        if aircraft_chars_layout.startswith(' '):
-            print("Error: aircraft chars layout can not start with white-space.")
-            continue
+    index = 0
+    temp_char = None
 
-        if aircraft_chars_layout.endswith(' '):
-            print("Error: aircraft chars layout can not end with white-space.")
-            continue
+    while index <= len(chars_layout) - 1:
+        temp_char = chars_layout[index]
 
-        result.append({
-            "char": aircraft_chars_layout[0],
-            "place": "Window"
-        })
-
-        is_valid_aircraft_layout = True
-        index = 1
-        temp_char = None
-
-        while index <= len(aircraft_chars_layout) - 2:
-            temp_char = aircraft_chars_layout[index]
-
-            if temp_char not in VALID_AIRCRAFT_CHAR_SYMBOLS:
-                is_valid_aircraft_layout = False
-                print("Error: invalid aircraft chars layout (allowed symbols: A-Z, white-space).")
-                break
-
-            if temp_char.isspace() and aircraft_chars_layout[index + 1].isspace():
-                is_valid_aircraft_layout = False
+        if temp_char == CHAR_GROUP_DELIMITER:
+            if chars_layout[index + 1] == CHAR_GROUP_DELIMITER:
                 print("Error: invalid input (two whitespaces in row).")
-                break
+                return False
+        else:
+            if temp_char not in VALID_AIRCRAFT_CHAR_SYMBOLS:
+                print("Error: invalid chars layout (allowed symbols: A-Z, white-space).")
+                return False
 
-            if temp_char != ' ':
-                if aircraft_chars_layout.count(temp_char) > 1:
-                    is_valid_aircraft_layout = False
-                    print("Error: char cant repeat itself.")
-                    break
+            if chars_layout.count(temp_char) > 1:
+                print("Error: char cant repeat itself.")
+                return False
 
-                if aircraft_chars_layout[index - 1] != ' ' \
-                    and aircraft_chars_layout[index + 1] != ' ':
+        index += 1
 
-                    result.append({
-                        "char": temp_char,
-                        "place": "Middle"
-                    })
+    return True
 
-                elif aircraft_chars_layout[index - 1] == ' ' \
-                    or aircraft_chars_layout[index + 1] == ' ':
+def getSeatInAircraftFromUser(chars_layout: str) -> str:
+    seat = None
 
-                    result.append({
-                        "char": temp_char,
-                        "place": "Aisle"
-                    })
+    while True:
+        seat = input("Enter aircraft seat: ")
+        seat = seat.upper()
 
-            index += 1
+        if not isValidSeatFormat(seat):
+            continue
 
-        result.append({
-            "char": aircraft_chars_layout[len(aircraft_chars_layout) - 1],
-            "place": "Window"
-        })
-
-        if not is_valid_aircraft_layout:
+        if not isSeatExistsInCharsLayout(chars_layout, seat):
             continue
 
         break
 
-    return result
+    return seat
+
+def isValidSeatFormat(seat: str) -> bool:
+    seat_len = len(seat)
+
+    if seat_len not in range(2, 3 + 1):
+        print("Error: seat length has to be in range from 2 to 3.")
+        return False
+
+    seat_row = seat[:seat_len - 1]
+
+    if not seat_row.isdigit():
+        print("Error: invalid format.")
+        return False
+
+    if not 1 <= int(seat_row) <= 99:
+        print("Error: seat row can not be lower than 1 or higher than 99.")
+        return False
+
+    seat_char = seat[seat_len - 1:]
+
+    if seat_char not in VALID_AIRCRAFT_CHAR_SYMBOLS:
+        print("Error: invalid seat char.")
+        return False
+
+    return True
+
+def isSeatExistsInCharsLayout(chars_layout: str, seat: str) -> bool:
+    seat_char = seat[len(seat) - 1:]
+    chars_list = [char for char in chars_layout if char != CHAR_GROUP_DELIMITER]
+    
+    if seat_char not in chars_list:
+        print("Error: entered char does not exists in this aircraft.")
+        return False
+
+    return True
+
+def getSeatPlacementInAircraft(chars_layout: str, seat: str) -> str:
+    seat_placement = None
+    seat_char = seat[len(seat) - 1:]
+
+    index = 0
+    temp_char = None
+
+    while index <= len(chars_layout) - 1:
+        temp_char = chars_layout[index]
+
+        if seat_char == temp_char:
+
+            if index in [0, len(chars_layout) - 1]:
+                seat_placement = "Window"
+
+            else:
+                if chars_layout[index - 1] != CHAR_GROUP_DELIMITER \
+                    and chars_layout[index + 1] != CHAR_GROUP_DELIMITER:
+                    seat_placement = "Middle"
+                else:
+                    seat_placement = "Aisle"
+
+            break
+        
+        index += 1
+        continue
+
+    return seat_placement
 
 if __name__ == '__main__':
     main()
