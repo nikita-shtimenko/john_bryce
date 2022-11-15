@@ -60,22 +60,22 @@ while True:
     else:
         print("Result: Draw! Congratulations!")
     
-    rounds_count += 1
     restart = None
 
     while True:
-        restart = input("Would you like to play one more round? (yes/no): ").capitalize()
+        restart = input("Would you like to play one more round? (yes/no): ").lower()
 
-        if restart not in ["Yes", "No"]:
+        if restart not in ["yes", "no"]:
             print("Error: invalid input. Please, type 'yes' or 'no'.")
             continue
 
         break
 
-    if restart == "Yes":
+    if restart == "yes":
+        rounds_count += 1
+
         print("Nice to hear! Starting next round...\n")
         continue
-
     else:
         print("\nEnd of game...\n")
         print(f"""
