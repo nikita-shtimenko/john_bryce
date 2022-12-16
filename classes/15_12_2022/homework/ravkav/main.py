@@ -1,5 +1,5 @@
 from datetime import date
-from homework.ravkav.ravkav import RavKav
+from ravkav import RavKav
 
 def main():
     # create/init ravkav card
