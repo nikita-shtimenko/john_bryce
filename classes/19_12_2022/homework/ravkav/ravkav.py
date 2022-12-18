@@ -1,7 +1,25 @@
 from datetime import date
 
-RIDE_UNLIMITED_LENGTH = float("inf") # infinity
-DATE_FORMAT_TYPE = "%d.%m.%Y"
+RAVKAV_RIDE_UNLIMITED_LENGTH = float("inf") # infinity
+RAVKAV_DATE_FORMAT_TYPE = "%d.%m.%Y"
+
+RAVKAV_RIDE_TYPES = {
+    "short": {
+        "min_distance": 0.1,
+        "max_distance": 15.0,
+        "price": 5.5
+    },
+    "medium": {
+        "min_distance": 15.1,
+        "max_distance": 40.0,
+        "price": 12.0
+    },
+    "long": {
+        "min_distance": 40.1,
+        "max_distance": RAVKAV_RIDE_UNLIMITED_LENGTH,
+        "price": 23.0
+    }
+}
 
 class RavKav:
     def __init__(self, holder_id: int, holder_name: str) -> None:
@@ -9,24 +27,6 @@ class RavKav:
         self.__holder_name: str = holder_name
         self.__balance: float = 0.0
         self.__rides_log: dict[str, list[str]] = dict()
-
-        self.__ride_types: dict[str, dict[str, float]] = {
-            "short": {
-                "min_distance": 0.1,
-                "max_distance": 15.0,
-                "price": 5.5
-            },
-            "medium": {
-                "min_distance": 15.1,
-                "max_distance": 40.0,
-                "price": 12.0
-            },
-            "long": {
-                "min_distance": 40.1,
-                "max_distance": RIDE_UNLIMITED_LENGTH,
-                "price": 23.0
-            }
-        }
 
     def get_holder_id(self) -> int:
         return self.__holder_id
@@ -48,21 +48,21 @@ class RavKav:
         if ride_distance <= 0.0:
             return False, "Invalid distance: <= 0.0"
 
-        for ride_type in self.__ride_types.keys():
-            min_distance = self.__ride_types[ride_type]["min_distance"]
-            max_distance = self.__ride_types[ride_type]["max_distance"]
+        for ride_type in RAVKAV_RIDE_TYPES.keys():
+            min_distance = RAVKAV_RIDE_TYPES[ride_type]["min_distance"]
+            max_distance = RAVKAV_RIDE_TYPES[ride_type]["max_distance"]
 
             if not min_distance <= ride_distance <= max_distance:
                 continue
 
-            ride_price = self.__ride_types[ride_type]["price"]
+            ride_price = RAVKAV_RIDE_TYPES[ride_type]["price"]
 
             if self.__balance < ride_price:
                 return False, "Not enough money for ride"
 
             self.__balance -= ride_price
 
-            ride_date_str = ride_date.strftime(DATE_FORMAT_TYPE)
+            ride_date_str = ride_date.strftime(RAVKAV_DATE_FORMAT_TYPE)
 
             if ride_date not in self.__rides_log.keys():
                 self.__rides_log[ride_date_str] = list()
@@ -73,7 +73,7 @@ class RavKav:
         return True, "Valid ride, added to rides log"
 
     def get_rides_count_by_date(self, ride_date: date) -> tuple[bool, int, str]:
-        ride_date_str = ride_date.strftime(DATE_FORMAT_TYPE)
+        ride_date_str = ride_date.strftime(RAVKAV_DATE_FORMAT_TYPE)
 
         if ride_date_str not in self.__rides_log.keys():
             return False, 0, "There are no rides for passed date"
@@ -84,7 +84,7 @@ class RavKav:
     def get_rides_count_by_type(self, ride_type: str) -> tuple[bool, int, str]:
         ride_type = ride_type.lower()
 
-        if ride_type not in self.__ride_types.keys():
+        if ride_type not in RAVKAV_RIDE_TYPES.keys():
             return False, 0, "Passed ride type does not exists"
 
         count = 0
