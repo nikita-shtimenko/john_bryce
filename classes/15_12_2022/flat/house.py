@@ -28,6 +28,9 @@ class House:
         if apartament.get_floor_number() > self.__floors_count:
             return False
 
+        if apartament in self.__apartaments:
+            return False
+
         self.__apartaments.append(apartament)
         return True
 

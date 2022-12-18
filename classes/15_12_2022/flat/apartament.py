@@ -32,12 +32,21 @@ class Apartament:
     def get_rooms_count(self) -> int:
         return len(self.__rooms)
 
-    def add_rooms(self, rooms: list[Room]) -> None:
+    def add_rooms(self, rooms: list[Room]) -> bool:
         for room in rooms:
+            if room in self.__rooms:
+                return False
+
             self.__rooms.append(room)
 
-    def remove_room(self, room: Room) -> None:
+        return True
+
+    def remove_room(self, room: Room) -> bool:
+        if room not in self.__rooms:
+            return False
+
         self.__rooms.remove(room)
+        return True
 
     def get_living_area_size(self) -> float:
         result = 0.0
