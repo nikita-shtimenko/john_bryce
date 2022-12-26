@@ -64,7 +64,7 @@ class RavKav:
 
             ride_date_str = ride_date.strftime(RAVKAV_DATE_FORMAT_TYPE)
 
-            if ride_date not in self.__rides_log.keys():
+            if ride_date_str not in self.__rides_log.keys():
                 self.__rides_log[ride_date_str] = list()
 
             self.__rides_log[ride_date_str].append(ride_type)
